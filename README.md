@@ -1,0 +1,1 @@
+# StatisticalAnalysis_Psycology_BayesFactorAndCohensD
