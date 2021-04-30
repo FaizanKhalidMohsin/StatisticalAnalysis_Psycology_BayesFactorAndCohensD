@@ -1,0 +1,88 @@
+---
+title: "Chris Kim Financial Econ YorkU"
+author: "Faizan Khalid Mohsin"
+date: "April 1, 2018"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 1:
+
+
+
+```{r }
+# Read in the data
+
+rbc = read.csv("RY.TO.csv")
+tsx = read.csv("TSX.Index.csv")
+tbills = read.csv("TBillsCorrected.csv")
+
+# Merge the data
+zmerged1 <- merge(tsx,rbc,by="Date")
+data= merge(zmerged1, tbills, by = "Date")
+
+```
+
+
+# Run CAPM: (Rj-Rf) on (Rm-Rf) and get an estimate of beta.
+
+
+```{r}
+attach(data)
+
+data$Rj.Rf = data$Rj - data$Rf
+data$Rm.Rf = data$Rm - data$Rf
+beta1 = cov(data$Rj.Rf, data$Rm.Rf)/var(data$Rm.Rf)
+beta1
+
+model1 = lm(Rj.Rf ~ Rm.Rf, data = data)
+beta = summary(model1)$coefficients
+beta
+
+```
+
+
+# Re-run the Fama-French Model 
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+
+
+```
+
+
+We do a diagnostic check for Hadocasticity
+
+```{r}
+
+# Checking Heterodecsticity 
+plot(model1)
+
+# Checking autocorrelation
+
+
+# Checking multicoliniearity
+# library(GGally)
+# ggpairs(X)
+# 
+# cor()
+
+```
+
+
+```{r}
+res = model1$res 
+n = length(res) 
+mod2 = lm(res[-n] ~ res[-1]) 
+summary(mod2)
+```
+
+
+END

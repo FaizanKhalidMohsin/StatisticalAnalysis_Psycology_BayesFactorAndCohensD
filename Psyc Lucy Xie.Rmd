@@ -1,0 +1,180 @@
+---
+title: "Psyc Lucy Xie"
+author: "Faizan Khalid Mohsin"
+date: "March 28, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+conclusions.			1.	Imagine	a	creativity	test	is	given	to	50	men	and	50	women.	Create	these	two	data	sets	using	the	R	function	“rnorm”.	(Example:	x	<-	rnorm(30,	100,	15)	will	give	you	30	normally	distributed	scores	with	a	mean	of	approximately	100	and	a	sd	of	approximately	15).	For	the	men,	the	mean	on	the	creativity	test	should	be	(approximately)	50	and	the	sd	(approximately)	10.	For	the	women,	the	mean	should	be	(approximately)	54	and	the	sd	(approximately)	20.	Use	the	R	function	“describe”	(in	the	“psych”	package)	on	each	of	the	two	datasets,	once	you	have	created	them,	to	ensure	that	your	means	are	close	to	where	they	should	be.	If	the	men’s	mean	is	off	by	more	than	1	full	point,	or	the	women’s	mean	is	off	by	more	than	2	full	points,	create	the	datas
+```{r }
+require(psych)
+
+
+men	<-	rnorm(50, 50,	10)
+women <- rnorm(50, 54, 20)
+
+men_data = describe(men)
+men_data$mean
+
+find_data = function(n, average, sd, limit){
+ 
+  i = 0
+  while (i < 1){
+    
+    a = rnorm(n, average, sd)
+    
+    if ( abs(describe(a)$mean - average) < limit){
+      i = i+1
+    }
+    
+  }
+  return(a)
+}
+
+men = find_data(50, 50, 10, 1)
+men
+describe(men)
+women = find_data(50, 54, 20, 2)
+describe(women)
+
+```
+
+
+
+Q ) Now do independant t.test for between men and women. 
+```{r}
+
+t.test(men, women)
+
+```
+
+
+Q ) Now assume equal variance for the t.test. 
+
+```{r echo=FALSE}
+
+t.test(men, women, var.equal = T)
+
+
+```
+
+The p-value decreased. from 0.3337 to 0.3329. Slightly less proof that they are not statistically significant. 
+
+Q )
+
+```{r}
+
+women53 = find_data(50, 53, 10, 1)
+describe(women53)
+t.test(men,women53)
+
+```
+
+```{r}
+
+women54 = find_data(50, 54, 10, 1)
+describe(women54)
+
+t.test(women54, men)
+
+```
+
+
+```{r}
+
+women55 = find_data(50, 55, 10, 1)
+describe(women55)
+
+t.test(women55, men)
+```
+
+Q ) Compute cohen's d using effsize package. 
+
+```{r}
+require(effsize)
+require(pwr)
+
+cohen53 = cohen.d(men, women53)$estimate
+cohen54 = cohen.d(men, women54)$estimate
+cohen55 = cohen.d(men, women55)$estimate
+
+pwr.t.test(n= 50, cohen53  )
+pwr.t.test(n= 50, cohen54  )
+pwr.t.test(n= 50, cohen55  )
+
+pvalue = 1:20
+m = matrix(0, nrow = 50, ncol = 20)
+
+for (i in 1:20){
+  m[,i] = find_data(50, 54, 10, 1)
+  pvalue[i] = t.test(men, m[,i])$p.value
+}
+
+
+pvalue
+pvalue.cut <- cut(pvalue, c(-1, 0.01, 0.05, 0.1, 2))
+pvalue.cut
+plot(table(pvalue.cut), xaxt='n', ylab='K')
+box(bty='L')
+
+xax <- barplot(table(pvalue.cut), xaxt='n')
+axis(1, at=xax, labels=c('< 0.01', '0.01-0.05', '0.05-0.1', '0.1<'))
+box(bty='L')
+
+```
+
+
+What does the bayes factor mean?
+
+The Bayes factor of C means that the data is C (6.5) times more likely to occur under the alternative hypothesis than it is under the null hypothesis. 
+
+Using Jeffery's rule of thumb about bayes factor it says that BF between 3 – 10 shows
+Moderate evidence for H1. 
+
+Caluculating bayes factor with Held nonogram for pvlaue = 0.01 and prior probablity of null and alternative hypthesis being equally like is 12.5% approximately. 
+
+Caluculating bayes factor with formula.
+```{r}
+
+```
+
+
+
+Bayes and rcorr in Hmisc package
+```{r}
+require(Hmisc)
+
+# Reading in your data and naming it:
+NeopiIQ = read.csv("")
+
+# Looking at the scatter plot of the two variables of interest. 
+
+ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
+
+
+attach(NeopiIQ)
+
+rcorr(neuroticism, openness)
+
+
+detach(NeopiIQ)
+
+NoSexNeopiIQ = NeopiIQ[,-1]
+
+cor(NoSexNeopiIQ)
+
+```
+
+
+END
